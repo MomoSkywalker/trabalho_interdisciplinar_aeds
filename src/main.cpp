@@ -1,7 +1,5 @@
-#include <iostream> // Biblioteca para entrada e saída de dados (cout, cin)
-#include <cstring>  // Biblioteca para manipulação de strings no estilo C (ex: strcpy)
-
-// --- Arquivos de cabeçalho do projeto (ainda a serem totalmente integrados) ---
+#include <iostream>
+#include <cstring>
 #include "slem.h"
 #include "locais.h"
 #include "veiculos.h"
@@ -9,12 +7,7 @@
 #include "rota.h"
 #include "arquivos.h"
 
-/**
- * @brief Exibe o menu principal com todas as opções do sistema.
- * * Limpa a tela para uma exibição mais limpa no terminal.
- */
 void exibirMenuPrincipal() {
-    // Comando para limpar o terminal, compatível com Linux ("clear") e Windows ("cls")
     system("clear || cls");
     std::cout << "===== Sistema de Logistica de Entrega de Mercadorias (SLEM) =====\n";
     std::cout << "1. Gerenciar Locais\n";
@@ -28,10 +21,6 @@ void exibirMenuPrincipal() {
     std::cout << "Escolha uma opcao: ";
 }
 
-/**
- * @brief Exibe um sub-menu genérico para as operações de CRUD.
- * * @param titulo O título do menu (ex: "Locais", "Veiculos").
- */
 void exibirSubMenu(const char* titulo) {
     system("clear || cls");
     std::cout << "===== Gerenciar " << titulo << " =====\n";
@@ -45,60 +34,121 @@ void exibirSubMenu(const char* titulo) {
 }
 
 int main() {
-    // --- Declaração dos arrays que armazenarão os dados em memória ---
     Local locais[MAX_ENTIDADES];
     Veiculo veiculos[MAX_ENTIDADES];
     Pedido pedidos[MAX_ENTIDADES];
-    // Contadores para saber quantos itens de cada tipo temos cadastrados
     int numLocais = 0, numVeiculos = 0, numPedidos = 0;
-    
-    int opcao; // Variável para armazenar a escolha do usuário no menu
+    int opcao;
 
-    // O loop principal do programa. Continua executando até que o usuário escolha a opção 0 para sair.
     do {
         exibirMenuPrincipal();
         std::cin >> opcao;
-        // Limpa o buffer de entrada. Essencial após ler um número para ler strings ou caracteres depois.
-        std::cin.ignore(); 
+        std::cin.ignore();
 
-        // Estrutura que direciona o fluxo do programa com base na escolha do usuário
         switch (opcao) {
-            case 1: 
-                // Gerenciamento de Locais (a ser implementado)
-                break;
-            case 2: 
-                // Gerenciamento de Veículos (a ser implementado)
-                break;
-            case 3:
-                // Gerenciamento de Pedidos (a ser implementado)
-                break;
-            case 4: {
-                // Cálculo de Rota (a ser implementado)
+            case 1: {
+                int subOpcao;
+                do {
+                    exibirSubMenu("Locais");
+                    std::cin >> subOpcao;
+                    std::cin.ignore();
+                    switch (subOpcao) {
+                        case 1: cadastrarLocal(locais, numLocais); break;
+                        case 2: listarLocais(locais, numLocais); break;
+                        case 3: atualizarLocal(locais, numLocais); break;
+                        case 4: excluirLocal(locais, numLocais); break;
+                        case 0: break;
+                        default: std::cout << "\nOpcao invalida.\n";
+                    }
+                } while (subOpcao != 0);
                 break;
             }
+            case 2: {
+                int subOpcao;
+                do {
+                    exibirSubMenu("Veiculos");
+                    std::cin >> subOpcao;
+                    std::cin.ignore();
+                    switch (subOpcao) {
+                        case 1: cadastrarVeiculo(veiculos, numVeiculos, locais, numLocais); break;
+                        case 2: listarVeiculos(veiculos, numVeiculos); break;
+                        case 3: atualizarVeiculo(veiculos, numVeiculos, locais, numLocais); break;
+                        case 4: excluirVeiculo(veiculos, numVeiculos); break;
+                        case 0: break;
+                        default: std::cout << "\nOpcao invalida.\n";
+                    }
+                } while (subOpcao != 0);
+                break;
+            }
+            case 3: {
+                int subOpcao;
+                do {
+                    exibirSubMenu("Pedidos");
+                    std::cin >> subOpcao;
+                    std::cin.ignore();
+                    switch (subOpcao) {
+                        case 1: cadastrarPedido(pedidos, numPedidos, locais, numLocais); break;
+                        case 2: listarPedidos(pedidos, numPedidos); break;
+                        case 3: std::cout << "\nOpcao de atualizar pedido nao disponivel.\n"; break;
+                        case 4: excluirPedido(pedidos, numPedidos); break;
+                        case 0: break;
+                        default: std::cout << "\nOpcao invalida.\n";
+                    }
+                } while (subOpcao != 0);
+                break;
+            }
+            // --- Bloco para Cálculo e Exibição da Rota ---
+            case 4: {
+                // Validação: precisamos de pedidos para calcular uma rota.
+                if (numPedidos == 0) {
+                    std::cout << "\nNenhum pedido para calcular rota. Cadastre um pedido primeiro.\n";
+                    break;
+                }
+                // Validação: precisamos de veículos para fazer a entrega.
+                if (numVeiculos == 0) {
+                    std::cout << "\nNenhum veiculo disponivel. Cadastre um veiculo primeiro.\n";
+                    break;
+                }
+
+                int idPedido;
+                std::cout << "\nDigite o ID do pedido para calcular a rota: ";
+                std::cin >> idPedido;
+                std::cin.ignore();
+
+                // Busca o pedido pelo ID fornecido para garantir que ele existe.
+                int indicePedido = buscarPedidoPorId(idPedido, pedidos, numPedidos);
+                
+                if (indicePedido != -1) {
+                    // Se o pedido foi encontrado, chama a função principal de logística.
+                    calcularExibirRota(pedidos[indicePedido], veiculos, numVeiculos, locais, numLocais);
+                } else {
+                    // Informa ao usuário se o ID do pedido não foi encontrado.
+                    std::cout << "\nPedido com ID " << idPedido << " nao encontrado.\n";
+                }
+                break;
+            }
+            // --- Bloco para Backup e Restauração de Dados ---
             case 5:
-                // Backup (a ser implementado)
+                // Chama a função para salvar todos os dados dos arrays em arquivos.
+                salvarDados(locais, numLocais, veiculos, numVeiculos, pedidos, numPedidos);
                 break;
             case 6:
-                // Restauração (a ser implementado)
+                // Chama a função para ler os dados dos arquivos e preencher os arrays.
+                restaurarDados(locais, numLocais, veiculos, numVeiculos, pedidos, numPedidos);
                 break;
             case 0:
-                // O usuário escolheu sair
                 std::cout << "\nSaindo do sistema...\n";
                 break;
             default:
-                // Tratamento para qualquer outra entrada numérica
                 std::cout << "\nOpcao invalida. Tente novamente.\n";
         }
 
-        // Pausa o programa e espera o usuário pressionar ENTER para continuar.
-        // Isso evita que a tela seja limpa imediatamente, permitindo que o usuário veja as mensagens.
-        if (opcao != 0) { // Não pausa se o programa estiver saindo
-             std::cout << "\nPressione ENTER para continuar...";
-             std::cin.get();
+        if (opcao != 0) {
+            std::cout << "\nPressione ENTER para continuar...";
+            // std::cin.get() aguarda o usuário pressionar a tecla Enter.
+            std::cin.get();
         }
-
     } while (opcao != 0);
 
-    return 0; // Indica que o programa terminou com sucesso
+    return 0;
 }
