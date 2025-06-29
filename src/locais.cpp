@@ -42,3 +42,12 @@ void cadastrarLocal(Local locais[], int &numLocais) {
     locais[numLocais++] = novoLocal;
     std::cout << "\nlocal cadastrado com sucesso\n";
 }
+void listarLocais(const Local locais[], int numLocais) {
+    if (numLocais == 0) {
+        std::cout << "nenhum local cadastrado\n";
+        return;
+    }
+    for (int i = 0; i < numLocais; ++i) {
+        std::cout << "nome " << locais[i].nome << " coordenadas " << locais[i].coordX << " " << locais[i].coordY << "\n";
+    }
+}
