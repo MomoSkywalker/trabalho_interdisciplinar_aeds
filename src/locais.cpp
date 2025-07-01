@@ -51,3 +51,38 @@ void listarLocais(const Local locais[], int numLocais) {
         std::cout << "nome " << locais[i].nome << " coordenadas " << locais[i].coordX << " " << locais[i].coordY << "\n";
     }
 }
+
+// atualiza as coordenadas de um local ja cadastrado
+void atualizarLocal(Local locais[], int numLocais) {
+    char nomeBusca[MAX_NOME];
+    std::cout << "digite o nome do local ";
+    std::cin.getline(nomeBusca, MAX_NOME);
+    int indice = buscarLocalPorNome(nomeBusca, locais, numLocais);
+    if (indice == -1) {
+        std::cout << "local nao encontrado\n";
+        return;
+    }
+    std::cout << "nova coordenada x ";
+    std::cin >> locais[indice].coordX;
+    std::cout << "nova coordenada y ";
+    std::cin >> locais[indice].coordY;
+    std::cin.ignore();
+    std::cout << "local atualizado com sucesso\n";
+}
+
+// exclui um local a partir do nome informado pelo usuario
+void excluirLocal(Local locais[], int &numLocais) {
+    char nomeBusca[MAX_NOME];
+    std::cout << "digite o nome do local a excluir ";
+    std::cin.getline(nomeBusca, MAX_NOME);
+    int indice = buscarLocalPorNome(nomeBusca, locais, numLocais);
+    if (indice == -1) {
+        std::cout << "local nao encontrado\n";
+        return;
+    }
+    for (int i = indice; i < numLocais - 1; ++i) {
+        locais[i] = locais[i + 1];
+    }
+    numLocais--;
+    std::cout << "local excluido\n";
+}
