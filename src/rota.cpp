@@ -2,7 +2,6 @@
 #include <cmath>
 #include <cfloat>
 #include <cstring>
-#include "slem.h"
 #include "rota.h"
 #include "locais.h"
 #include "veiculos.h"
@@ -41,12 +40,8 @@ void calcularExibirRota(Pedido &pedido, Veiculo veiculos[], int numVeiculos, con
         return;
     }
 
-    // A distância total vai ser a soma de dois pedaços:
-    // 1. Do veículo até o ponto de coleta (a `menorDistancia` que já achamos).
-    // 2. Do ponto de coleta até o ponto de entrega.
     double distTotal = menorDistancia + calcularDistancia(locais[idxOrigem], locais[idxDestino]);
 
-    // Agora é só mostrar o resumo de tudo.
     std::cout << "\n--- Rota de Entrega ---\n";
     std::cout << "Pedido ID: " << pedido.id << "\n";
     std::cout << "Veiculo: " << veiculos[idxVeiculo].placa << "\n";
@@ -54,13 +49,10 @@ void calcularExibirRota(Pedido &pedido, Veiculo veiculos[], int numVeiculos, con
               << pedido.localOrigem << " -> " << pedido.localDestino << "\n";
     std::cout << "Distancia total: " << distTotal << "\n";
 
-    // --- Simulação da Entrega ---
-    // Aqui a gente finge que a entrega aconteceu.
-    veiculos[idxVeiculo].status = OCUPADO; // Veículo sai pra entrega
-    // Neste sistema simples, a entrega é instantânea.
-    veiculos[idxVeiculo].status = DISPONIVEL; // Já ficou disponível de novo.
-    
-    // E o veículo agora está no seu destino final.
+    veiculos[idxVeiculo].status = OCUPADO;
+    // Em um sistema real, o status só voltaria para DISPONIVEL após a entrega.
+    // Para simplificar, vamos simular que a entrega é feita e o veículo já volta a ficar disponível.
     strcpy(veiculos[idxVeiculo].localAtual, pedido.localDestino);
+    veiculos[idxVeiculo].status = DISPONIVEL;
     std::cout << "Entrega finalizada. Veiculo agora esta em: " << veiculos[idxVeiculo].localAtual << "\n";
 }

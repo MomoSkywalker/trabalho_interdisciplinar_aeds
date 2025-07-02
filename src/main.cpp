@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstring>
+#include <cstdlib> // Para system()
 #include "slem.h"
 #include "locais.h"
 #include "veiculos.h"
@@ -40,6 +40,8 @@ int main() {
     int numLocais = 0, numVeiculos = 0, numPedidos = 0;
     int opcao;
 
+    restaurarDados(locais, numLocais, veiculos, numVeiculos, pedidos, numPedidos);
+
     do {
         exibirMenuPrincipal();
         std::cin >> opcao;
@@ -57,9 +59,8 @@ int main() {
                         case 2: listarLocais(locais, numLocais); break;
                         case 3: atualizarLocal(locais, numLocais); break;
                         case 4: excluirLocal(locais, numLocais); break;
-                        case 0: break;
-                        default: std::cout << "\nOpcao invalida.\n";
                     }
+                    if (subOpcao != 0 && subOpcao <= 4) { std::cout << "\nPressione ENTER para continuar..."; std::cin.get(); }
                 } while (subOpcao != 0);
                 break;
             }
@@ -74,9 +75,8 @@ int main() {
                         case 2: listarVeiculos(veiculos, numVeiculos); break;
                         case 3: atualizarVeiculo(veiculos, numVeiculos, locais, numLocais); break;
                         case 4: excluirVeiculo(veiculos, numVeiculos); break;
-                        case 0: break;
-                        default: std::cout << "\nOpcao invalida.\n";
                     }
+                     if (subOpcao != 0 && subOpcao <= 4) { std::cout << "\nPressione ENTER para continuar..."; std::cin.get(); }
                 } while (subOpcao != 0);
                 break;
             }
@@ -91,62 +91,50 @@ int main() {
                         case 2: listarPedidos(pedidos, numPedidos); break;
                         case 3: std::cout << "\nOpcao de atualizar pedido nao disponivel.\n"; break;
                         case 4: excluirPedido(pedidos, numPedidos); break;
-                        case 0: break;
-                        default: std::cout << "\nOpcao invalida.\n";
                     }
+                     if (subOpcao != 0 && subOpcao <= 4) { std::cout << "\nPressione ENTER para continuar..."; std::cin.get(); }
                 } while (subOpcao != 0);
                 break;
             }
-            // --- Bloco para Cálculo e Exibição da Rota ---
             case 4: {
-                // Validação: precisamos de pedidos para calcular uma rota.
                 if (numPedidos == 0) {
-                    std::cout << "\nNenhum pedido para calcular rota. Cadastre um pedido primeiro.\n";
-                    break;
-                }
-                // Validação: precisamos de veículos para fazer a entrega.
-                if (numVeiculos == 0) {
-                    std::cout << "\nNenhum veiculo disponivel. Cadastre um veiculo primeiro.\n";
-                    break;
-                }
-
-                int idPedido;
-                std::cout << "\nDigite o ID do pedido para calcular a rota: ";
-                std::cin >> idPedido;
-                std::cin.ignore();
-
-                // Busca o pedido pelo ID fornecido para garantir que ele existe.
-                int indicePedido = buscarPedidoPorId(idPedido, pedidos, numPedidos);
-                
-                if (indicePedido != -1) {
-                    // Se o pedido foi encontrado, chama a função principal de logística.
-                    calcularExibirRota(pedidos[indicePedido], veiculos, numVeiculos, locais, numLocais);
+                    std::cout << "\nNenhum pedido para calcular rota.\n";
+                } else if (numVeiculos == 0) {
+                    std::cout << "\nNenhum veiculo disponivel para realizar entrega.\n";
                 } else {
-                    // Informa ao usuário se o ID do pedido não foi encontrado.
-                    std::cout << "\nPedido com ID " << idPedido << " nao encontrado.\n";
+                    int idPedido;
+                    std::cout << "\nDigite o ID do pedido para calcular a rota: ";
+                    std::cin >> idPedido;
+                    std::cin.ignore();
+                    int indicePedido = buscarPedidoPorId(idPedido, pedidos, numPedidos);
+                    if (indicePedido != -1) {
+                        calcularExibirRota(pedidos[indicePedido], veiculos, numVeiculos, locais, numLocais);
+                    } else {
+                        std::cout << "\nPedido com ID " << idPedido << " nao encontrado.\n";
+                    }
                 }
+                std::cout << "\nPressione ENTER para continuar...";
+                std::cin.get();
                 break;
             }
-            // --- Bloco para Backup e Restauração de Dados ---
             case 5:
-                // Chama a função para salvar todos os dados dos arrays em arquivos.
                 salvarDados(locais, numLocais, veiculos, numVeiculos, pedidos, numPedidos);
+                std::cout << "\nPressione ENTER para continuar...";
+                std::cin.get();
                 break;
             case 6:
-                // Chama a função para ler os dados dos arquivos e preencher os arrays.
                 restaurarDados(locais, numLocais, veiculos, numVeiculos, pedidos, numPedidos);
+                std::cout << "\nPressione ENTER para continuar...";
+                std::cin.get();
                 break;
             case 0:
+                salvarDados(locais, numLocais, veiculos, numVeiculos, pedidos, numPedidos);
                 std::cout << "\nSaindo do sistema...\n";
                 break;
             default:
                 std::cout << "\nOpcao invalida. Tente novamente.\n";
-        }
-
-        if (opcao != 0) {
-            std::cout << "\nPressione ENTER para continuar...";
-            // std::cin.get() aguarda o usuário pressionar a tecla Enter.
-            std::cin.get();
+                std::cout << "\nPressione ENTER para continuar...";
+                std::cin.get();
         }
     } while (opcao != 0);
 
