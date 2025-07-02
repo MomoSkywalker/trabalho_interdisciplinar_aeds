@@ -1,0 +1,5 @@
+# Ignorar ficheiros de vídeo
+*.mp4
+
+# Ignorar ficheiros de dados binários
+dados_bin
